@@ -9,6 +9,6 @@ All assets are CC0 (public domain).
 
 ## Credits
 
-| Pack | Author | Source | Used for |
-|------|--------|--------|----------|
-| Dungeon Tileset II | 0x72 | https://0x72.itch.io/dungeontileset-ii | tiles, characters, items (from Chapter 3) |
+| Pack | Author | Source | License | Used for |
+|------|--------|--------|---------|----------|
+| Dungeon Tileset II v1.7 | 0x72 | https://0x72.itch.io/dungeontileset-ii | CC0 (stated on the itch.io page) | tiles, characters, items (from Chapter 3) |

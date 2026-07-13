@@ -18,6 +18,7 @@ if [ ${#chapters[@]} -eq 0 ]; then
 fi
 
 for ch in "${chapters[@]}"; do
-  rsync -a --delete --exclude 'README.md' "$root/assets/" "${ch}assets/"
+  rsync -a --delete --exclude 'README.md' --exclude '.DS_Store' \
+    "$root/assets/" "${ch}assets/"
   echo "synced $(basename "$ch")/assets"
 done
