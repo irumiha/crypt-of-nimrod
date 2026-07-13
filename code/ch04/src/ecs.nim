@@ -1,3 +1,11 @@
+## The game's entity-component-system, all of it.
+##
+## An entity is a slot index plus a generation. Components are columns:
+## one seq per component type, all the same length, with a per-slot
+## bitset mask saying which columns apply. Queries scan the masks.
+## Deliberately not generic and not a library; it knows this game's
+## components by name, and adding one is a three-line diff.
+
 import std/strformat
 import raylib
 import sprites
@@ -7,7 +15,9 @@ type
     ckPosition, ckVelocity, ckSprite, ckLifetime
 
   Entity* = object
-    ## A typed handle: a slot index plus the generation it was issued in.
+    ## A typed handle: a slot index plus the generation it was issued
+    ## in. If the slot has been despawned and reused since, the
+    ## generations no longer match and the handle is stale (see alive).
     idx*: int32
     gen*: uint32
 
@@ -23,16 +33,26 @@ type
     lifetimes*: seq[float32]
 
 proc alive*(w: World, e: Entity): bool =
+  ## True while the handle still refers to the entity it was issued
+  ## for. A despawned (or despawned-and-reused) slot fails the
+  ## generation check, so stale handles read as dead instead of
+  ## pointing at whoever lives there now.
   e.idx < int32(w.gens.len) and w.gens[e.idx] == e.gen
 
 proc entity*(w: World, idx: int32): Entity =
-  ## The current handle for a slot index (used inside systems).
+  ## The current handle for a slot index (used inside systems, where
+  ## queries yield raw indices).
   Entity(idx: idx, gen: w.gens[idx])
 
 proc entityCount*(w: World): int =
+  ## Live entities right now (allocated slots minus the free list).
   w.masks.len - w.freeSlots.len
 
 proc spawn*(w: var World, comps: set[CompKind]): Entity =
+  ## Claims a slot (reusing a despawned one when available), stamps it
+  ## with the component mask, and returns its handle. Component data
+  ## is whatever the constructor defaults are; the caller fills in the
+  ## columns it declared.
   var idx: int32
   if w.freeSlots.len > 0:
     idx = w.freeSlots.pop()
@@ -48,6 +68,11 @@ proc spawn*(w: var World, comps: set[CompKind]): Entity =
   Entity(idx: idx, gen: w.gens[idx])
 
 proc despawn*(w: var World, e: Entity) =
+  ## Retires an entity: clears its mask, invalidates every existing
+  ## handle to it, and files the slot for reuse. The component data is
+  ## left in place, unreachable, until the next tenant overwrites it.
+  ## Never call this while iterating a query; collect first (see
+  ## lifetimeSystem for the pattern).
   if w.alive(e):
     w.masks[e.idx] = {}
     inc w.gens[e.idx]           # every old handle to this slot goes stale
@@ -55,12 +80,18 @@ proc despawn*(w: var World, e: Entity) =
 
 iterator query*(w: World, comps: set[CompKind]): int32 =
   ## Every live slot that has at least the requested components.
+  ## `<=` is the bitset subset test: one AND and one compare per slot.
+  ## Dead slots have mask {} and never match. Scans every slot ever
+  ## allocated, which at this game's scale is nanoseconds.
   for i in 0 ..< w.masks.len:
     if comps <= w.masks[i]:
       yield int32(i)
 
 proc dump*(w: World, e: Entity): string =
-  ## The whole entity, reassembled for inspection.
+  ## The whole entity, reassembled for inspection: the answer to "ECS
+  ## smears my entity across four arrays." Keep this current as
+  ## components get added; it is the debugging tool this architecture
+  ## owes you.
   if not w.alive(e):
     return &"entity {e.idx}: dead (stale handle, gen {e.gen})"
   result = &"entity {e.idx} (gen {e.gen})"

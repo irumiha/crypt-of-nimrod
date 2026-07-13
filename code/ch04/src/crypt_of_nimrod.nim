@@ -1,3 +1,8 @@
+## Chapter 4: the crypt comes alive. Critters bounce around the floor,
+## coins spawn and expire, and the knight stands still because no
+## system has any business with him (he has no Velocity component).
+## The frame loop is now just a list of system calls.
+
 import std/random
 import raylib
 import ecs, resources, sprites, systems
@@ -9,9 +14,15 @@ const
   tileSize = 16*scale
   backgroundColor = Color(r: 24, g: 20, b: 37, a: 255)
   atlasDir = "assets/0x72_DungeonTilesetII_v1.7/"
+  # Every name here must exist in the atlas as <name>_idle_anim; a bad
+  # one fails loudly at spawn ("ice_zombie" taught us that; the pack
+  # names its animation ice_zombie_anim, with no idle variant).
   critterNames = ["goblin", "skelet", "imp", "chort", "ogre"]
 
 proc spawnCritter(w: var World, atlas: Atlas) =
+  ## A random monster somewhere on the floor, drifting in a random
+  ## direction. Spawning is: claim a slot with a mask, fill in the
+  ## columns you declared.
   let e = w.spawn({ckPosition, ckVelocity, ckSprite})
   let name = critterNames[rand(critterNames.high)]
   w.sprites[e.idx] = initAnimSprite(atlas, name & "_idle_anim", scale)
@@ -23,6 +34,8 @@ proc spawnCritter(w: var World, atlas: Atlas) =
     y: float32(rand(-120.0..120.0)))
 
 proc spawnCoin(w: var World, atlas: Atlas) =
+  ## A coin that expires on its own: same spawn shape as a critter,
+  ## but with Lifetime instead of Velocity in the parts list.
   let e = w.spawn({ckPosition, ckSprite, ckLifetime})
   w.sprites[e.idx] = initAnimSprite(atlas, "coin_anim", scale)
   w.positions[e.idx] = Vector2(
@@ -41,7 +54,7 @@ proc main =
     atlasDir & "0x72_DungeonTilesetII_v1.7.png",
     atlasDir & "tile_list_v1.7")
 
-  # The floor: one variant per cell, rolled once at startup.
+  # The floor: one variant per cell, rolled once at startup (Chapter 3).
   const cols = screenWidth div tileSize
   const rows = screenHeight div tileSize + 1
   var floorTiles: seq[Rectangle]
@@ -53,6 +66,7 @@ proc main =
   var world = World()
 
   # The knight: no Velocity, so movement and bounce never touch him.
+  # Behavior comes from the parts list, not from an isPlayer flag.
   let knight = world.spawn({ckPosition, ckSprite})
   world.sprites[knight.idx] = initAnimSprite(atlas, "knight_m_idle_anim", scale)
   world.positions[knight.idx] = Vector2(
@@ -62,7 +76,7 @@ proc main =
   for _ in 1..10:
     world.spawnCritter(atlas)
 
-  echo world.dump(knight)
+  echo world.dump(knight)       # the echo test: any entity, reassembled
 
   var coinTimer: float32 = 0
 
@@ -89,6 +103,7 @@ proc main =
         width: tileSize, height: tileSize)
       drawTexture(atlas.texture, rect, dest, Vector2(x: 0, y: 0), 0, White)
     world.drawSystem(atlas)
+    # Watch this plateau: expired coins hand their slots to new ones.
     drawText("entities: " & $world.entityCount, 10, 40, 20, LightGray)
     drawFPS(10, 10)
     endDrawing()

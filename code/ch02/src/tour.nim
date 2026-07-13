@@ -1,5 +1,6 @@
-# The Chapter 2 language tour. Pure Nim, no raylib.
-# Run it with:  nimble tour   (or: nim r src/tour.nim)
+## The Chapter 2 language tour. Pure Nim, no raylib.
+## Run it with:  nimble tour   (or: nim r src/tour.nim)
+## Every snippet in the chapter lives here; vandalize freely.
 import std/[tables, strformat]
 
 # --- Bindings: let, var, const ------------------------------------------
