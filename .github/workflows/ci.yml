@@ -1,0 +1,71 @@
+# Builds every chapter snapshot on every push, so no chapter ever rots.
+# Chapters are discovered dynamically: adding code/ch16/ requires no CI edits.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  discover:
+    name: Discover chapters
+    runs-on: ubuntu-latest
+    outputs:
+      chapters: ${{ steps.list.outputs.chapters }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: |
+          chapters=$(find code -mindepth 1 -maxdepth 1 -type d -name 'ch*' -printf '%f\n' \
+            | sort | jq -R . | jq -sc .)
+          echo "chapters=$chapters" >> "$GITHUB_OUTPUT"
+          echo "Found chapters: $chapters"
+
+  build:
+    name: Build ${{ matrix.chapter }}
+    needs: discover
+    if: needs.discover.outputs.chapters != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chapter: ${{ fromJSON(needs.discover.outputs.chapters) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jiro4989/setup-nim-action@v2
+        with:
+          nim-version: 'stable'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # raylib is compiled from source by naylib and needs the usual
+      # windowing/audio dev headers (list mirrors naylib's own CI).
+      - name: Install raylib system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libx11-dev libxrandr-dev \
+            libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev \
+            libxinerama-dev libwayland-dev libxkbcommon-dev
+
+      - name: Build
+        working-directory: code/${{ matrix.chapter }}
+        run: nimble build -Y
+
+  # Every chapter carries its own copy of assets/ so it is standalone.
+  # This job makes sure no copy drifts from the canonical top-level assets/.
+  assets-in-sync:
+    name: Chapter assets in sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          status=0
+          for ch in code/ch*/; do
+            [ -d "$ch" ] || continue
+            if ! diff -r assets "${ch}assets" > /dev/null 2>&1; then
+              echo "::error::${ch}assets is out of sync with assets/ — run tools/sync_assets.sh"
+              status=1
+            fi
+          done
+          exit $status
