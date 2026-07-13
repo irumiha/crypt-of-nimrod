@@ -65,7 +65,7 @@ That's the whole ceremony.
 
 ## Making it your own
 
-You bought the book (thank you), you built the game, and now you want to take
+You got the book (thank you), you built the game, and now you want to take
 it somewhere the book doesn't go. Any chapter directory works as a standalone
 project — copy it out and it is yours:
 
