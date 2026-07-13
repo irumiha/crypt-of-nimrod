@@ -4,7 +4,7 @@ A top-down action roguelite written in [Nim](https://nim-lang.org) with
 [raylib](https://www.raylib.com) (via the excellent
 [naylib](https://github.com/planetis-m/naylib) binding).
 
-Descend the crypt. Fight what lives there. Reclaim the crown.
+Descend the crypt and reclaim the crown.
 
 This is the companion repository for the book *(title in progress)* — a book
 about building games in Nim for people whose day job is Java, C#, or something
@@ -61,8 +61,6 @@ cd code/ch05
 nimble run
 ```
 
-That's the whole ceremony.
-
 ## Making it your own
 
 You got the book (thank you), you built the game, and now you want to take
@@ -76,8 +74,8 @@ git init
 nimble run
 ```
 
-No paths to fix, no assets to hunt down, no build scripts to adapt. From here
-on it's a perfectly normal Nim project that happens to have a great backstory.
+There are no paths to fix and no build scripts to adapt. From here on it is
+an ordinary Nim project.
 
 If you want your friends to play it, steal our release pipeline too: copy
 `.github/workflows/release.yml` into your repo, push a tag, and GitHub builds
@@ -87,8 +85,8 @@ walks through how it works.
 ## Assets
 
 All art and audio is CC0 (public domain). Individual packs and their sources
-are credited in [assets/README.md](assets/README.md). You can ship them, remix
-them, or replace them with your own programmer art — no strings attached.
+are credited in [assets/README.md](assets/README.md). You can ship them,
+remix them, or replace them with your own.
 
 ## License
 
