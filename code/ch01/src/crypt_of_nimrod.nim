@@ -26,6 +26,7 @@ proc drawCrown(cx, cy: int32) =
   drawCircle(cx, cy + 50, 18, Color(r: 165, g: 48, b: 48, a: 255))
 
 proc main =
+  setConfigFlags(flags(WindowHighdpi))
   initWindow(screenWidth, screenHeight, "Crypt of Nimrod")
   defer: closeWindow()
   setTargetFPS(60)
