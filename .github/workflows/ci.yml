@@ -52,6 +52,15 @@ jobs:
         working-directory: code/${{ matrix.chapter }}
         run: nimble build -Y
 
+      # Some chapters ship extra runnable material (e.g. ch02's language
+      # tour). Pure-stdlib, so plain `nim c` suffices.
+      - name: Build language tour (if present)
+        working-directory: code/${{ matrix.chapter }}
+        run: |
+          if [ -f src/tour.nim ]; then
+            nim c --outdir:bin src/tour.nim
+          fi
+
   # Every chapter carries its own copy of assets/ so it is standalone.
   # This job makes sure no copy drifts from the canonical top-level assets/:
   # re-running the sync must leave the working tree untouched.
