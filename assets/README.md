@@ -11,4 +11,4 @@ All assets are CC0 (public domain).
 
 | Pack | Author | Source | Used for |
 |------|--------|--------|----------|
-| *(to be added as the book progresses)* | | | |
+| Dungeon Tileset II | 0x72 | https://0x72.itch.io/dungeontileset-ii | tiles, characters, items (from Chapter 3) |

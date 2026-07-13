@@ -53,19 +53,17 @@ jobs:
         run: nimble build -Y
 
   # Every chapter carries its own copy of assets/ so it is standalone.
-  # This job makes sure no copy drifts from the canonical top-level assets/.
+  # This job makes sure no copy drifts from the canonical top-level assets/:
+  # re-running the sync must leave the working tree untouched.
   assets-in-sync:
     name: Chapter assets in sync
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: |
-          status=0
-          for ch in code/ch*/; do
-            [ -d "$ch" ] || continue
-            if ! diff -r assets "${ch}assets" > /dev/null 2>&1; then
-              echo "::error::${ch}assets is out of sync with assets/ — run tools/sync_assets.sh"
-              status=1
-            fi
-          done
-          exit $status
+          tools/sync_assets.sh
+          if [ -n "$(git status --porcelain -- 'code/*/assets')" ]; then
+            echo "::error::chapter assets out of sync — run tools/sync_assets.sh and commit"
+            git status --porcelain -- 'code/*/assets'
+            exit 1
+          fi
