@@ -21,6 +21,7 @@ e.g. `python3 -m http.server -d web`.
 | `web/shell.html` | new | the page the game embeds into: centers the canvas and applies the Chapter 12 integer-scaling rule in CSS (largest integer scale in device pixels); no external requests |
 | `config.nims` | changed | emscripten target block: GLSL-ES 2, emcc as the C compiler, asset preloading, the memory-growth flags with their war story |
 | `crypt_of_nimrod.nimble` | changed | + `task web` |
+| `src/camera.nim` | changed | `computeViewport`: on the web the canvas is the framebuffer, so the screen-unit conversion divides by 1, not by the browser's devicePixelRatio |
 | `src/crypt_of_nimrod.nim` | changed | main restructured: `Game` object + `frame(g)` proc (template aliases keep the body verbatim); desktop keeps the `while` loop, the web hands `frame` to `emscriptenSetMainLoop` |
 | `.github/workflows/release.yml` | new (repo root) | tag → Linux/Windows/macOS zips attached to a GitHub release |
 | `.github/workflows/pages.yml` | new (repo root) | push → WebAssembly build deployed to GitHub Pages |

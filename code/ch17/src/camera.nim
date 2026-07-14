@@ -49,7 +49,16 @@ proc computeViewport*(logicalW, logicalH: int32): Viewport =
   ## converted back to raylib's screen units for the final blit (on a
   ## HiDPI display those units are scaled by the OS factor, so doing
   ## the integer math in physical pixels keeps texels square).
-  let dpi = getWindowScaleDPI().x
+  when defined(emscripten):
+    # On the web the canvas IS the framebuffer: screen units and
+    # physical pixels are the same 800x450, and the page does the
+    # display scaling (see web/shell.html). raylib still reports the
+    # browser's devicePixelRatio here, and dividing by it would blit
+    # the game into a dpr-sized corner of its own canvas — which is
+    # exactly what it did, on the first HiDPI screen it met.
+    let dpi = 1'f32
+  else:
+    let dpi = getWindowScaleDPI().x
   let physW = float32(getRenderWidth())
   let physH = float32(getRenderHeight())
   let s = max(1'f32, floor(min(physW/float32(logicalW),
