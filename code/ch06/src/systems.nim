@@ -4,7 +4,7 @@
 ##
 ## Data flows between systems implicitly (one writes state, a later one
 ## reads it), which is why every system below declares what it reads
-## and writes. Keep that honest when editing.
+## and writes. Keep those lines accurate when editing.
 
 import raylib, raymath
 import ecs, input, resources, sprites
