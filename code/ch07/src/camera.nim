@@ -11,6 +11,16 @@ proc makeCamera*(screenSize: Vector2): Camera2D =
   ## middle of the screen.
   Camera2D(offset: screenSize*0.5, target: Vector2(), zoom: 1)
 
+proc adaptToDpi*(cam: var Camera2D, screenSize: Vector2) =
+  ## raylib scales screen-space drawing on HiDPI displays, but resets
+  ## the matrix inside beginMode2D, so world rendering must bake the
+  ## DPI scale into the camera itself: zoom by the scale, and pin the
+  ## target to the center of the real framebuffer. A no-op at scale 1,
+  ## and follow()'s clamps stay correct because they divide by zoom.
+  let s = getWindowScaleDPI().x
+  cam.zoom = s
+  cam.offset = screenSize*(0.5*s)
+
 proc follow*(cam: var Camera2D, target: Vector2, mapSize: Vector2,
              dt: float32) =
   ## Eases the camera toward the target, then clamps it so the view

@@ -108,7 +108,9 @@ proc main =
     world.actorAnimSystem(atlas)
     world.animationSystem(dt)
     world.lifetimeSystem(dt)
-    # The camera watches the knight's center, clamped to the map.
+    # The camera watches the knight's center, clamped to the map,
+    # zoomed to compensate for display scaling.
+    cam.adaptToDpi(Vector2(x: screenWidth, y: screenHeight))
     let knightCenter = world.positions[knight.idx] + Vector2(
       x: world.sprites[knight.idx].width/2,
       y: world.sprites[knight.idx].height/2)
