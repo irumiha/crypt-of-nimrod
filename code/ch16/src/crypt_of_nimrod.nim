@@ -298,7 +298,7 @@ proc main =
         run.world.swingSword(atlas, run.knight, run.swordPower)
         bank.play(sfxSwing)
       run.world.playerInputSystem(playerSpeed)
-      run.world.aiSystem(run.knight)
+      run.world.aiSystem(run.knight, run.crypt)
       # --- the boss's turn: phase flip and minion calls ---
       var bossPos = Vector2()
       let bossIdx = run.world.findBoss()

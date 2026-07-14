@@ -8,7 +8,7 @@
 
 import std/random
 import raylib, raymath
-import collision, ecs, input, resources, shaders, sprites, tilemap
+import collision, dungeon, ecs, input, resources, shaders, sprites, tilemap
 
 proc playerInputSystem*(w: var World, speed: float32) =
   ## Turns the player's held keys into velocity, overwriting whatever
@@ -19,23 +19,30 @@ proc playerInputSystem*(w: var World, speed: float32) =
     if not (w.has(i, ckHealth) and w.healths[i].stun > 0):
       w.velocities[i] = moveAxis()*speed
 
-proc aiSystem*(w: var World, player: Entity) =
+proc aiSystem*(w: var World, player: Entity, d: Dungeon) =
   ## The enemy brain: wander until the player is inside aggro range,
   ## chase until they get away (with slack, so the boundary doesn't
-  ## flip-flop), and do nothing while stunned.
-  ## Reads: Position, Ai, Health. Writes: Velocity, Ai.
+  ## flip-flop), and do nothing while stunned. Sensing is room-scoped,
+  ## because aggro is a distance check and distance doesn't respect
+  ## walls: without the room test, enemies smell the player through
+  ## them, steer into the nearest wall, and slide along it into the
+  ## doorway, where they wait. Each room is its own arena.
+  ## Reads: Position, Ai, Health, the dungeon's rooms.
+  ## Writes: Velocity, Ai.
   if w.alive(player):
     let target = w.positions[player.idx]
+    let playerRoom = d.roomAt(target)
     for i in w.query({ckAi, ckPosition, ckVelocity}):
       if not (w.has(i, ckHealth) and w.healths[i].stun > 0):
         let toPlayer = target - w.positions[i]
         let dist = length(toPlayer)
+        let sameRoom = d.roomAt(w.positions[i]) == playerRoom
         case w.ais[i].state
         of asWander:
-          if dist < w.ais[i].aggro:
+          if sameRoom and dist < w.ais[i].aggro:
             w.ais[i].state = asChase
         of asChase:
-          if dist > w.ais[i].aggro*1.6:
+          if not sameRoom or dist > w.ais[i].aggro*1.6:
             w.ais[i].state = asWander
             # Pick a fresh direction to drift off in.
             w.velocities[i] = Vector2(

@@ -3,7 +3,7 @@
 
 import std/unittest
 import raylib, raymath
-import ecs, systems
+import dungeon, ecs, systems
 
 proc fighter(w: var World, x, y: float32, hp: int32, layer: Layer,
              hits: set[Layer] = {}, dmg: int32 = 0): Entity =
@@ -67,21 +67,43 @@ suite "damage":
 suite "enemy ai":
   setup:
     var world = World()
+    let crypt = generate(11, 1)
+    let home = crypt.roomCenter(crypt.startRoom)
     let player = world.spawn({ckPosition, ckPlayer})
-    world.positions[player.idx] = Vector2(x: 50, y: 0)
+    world.positions[player.idx] = home + Vector2(x: 50, y: 0)
     let enemy = world.spawn({ckPosition, ckVelocity, ckAi})
+    world.positions[enemy.idx] = home
     world.ais[enemy.idx] = Ai(chaseSpeed: 100, aggro: 100)
 
   test "wander flips to chase inside aggro range, and steers":
-    world.aiSystem(player)
+    world.aiSystem(player, crypt)
     check world.ais[enemy.idx].state == asChase
     check world.velocities[enemy.idx].x > 0    # toward the player
 
   test "chase gives up beyond the slack boundary, not at it":
-    world.aiSystem(player)                      # now chasing
-    world.positions[player.idx].x = 130         # past aggro, inside slack
-    world.aiSystem(player)
+    world.aiSystem(player, crypt)               # now chasing
+    world.positions[player.idx] = home + Vector2(x: 130, y: 0)
+    world.aiSystem(player, crypt)               # past aggro, inside slack
     check world.ais[enemy.idx].state == asChase # hysteresis holds it
-    world.positions[player.idx].x = 500         # decisively gone
-    world.aiSystem(player)
+    world.positions[player.idx] = home + Vector2(x: 300, y: 0)
+    world.aiSystem(player, crypt)               # decisively gone (in-room)
+    check world.ais[enemy.idx].state == asWander
+
+  test "the wall blocks the sense of smell":
+    # Find a room adjacent to the start room; the generator's random
+    # walk guarantees one exists.
+    var other = -1
+    for j, r in crypt.rooms:
+      if j != crypt.startRoom and
+          abs(r.gx - crypt.rooms[crypt.startRoom].gx) +
+          abs(r.gy - crypt.rooms[crypt.startRoom].gy) == 1:
+        other = j
+    check other >= 0
+    # Both stand near the shared border: within aggro as the crow
+    # flies, in different rooms as the wall insists.
+    let a = crypt.roomCenter(crypt.startRoom)
+    let b = crypt.roomCenter(other)
+    world.positions[enemy.idx] = a + (b - a)*0.45
+    world.positions[player.idx] = b + (a - b)*0.45
+    world.aiSystem(player, crypt)
     check world.ais[enemy.idx].state == asWander

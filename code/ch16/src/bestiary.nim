@@ -21,9 +21,10 @@ const imp* = enemyKinds[2]   ## the boss's minion of choice: fast, frail
 const warden* = EnemyStats(
   ## The boss. Slow and huge; the fight's pressure comes from the
   ## locked room, the contact damage, and the minions, not from
-  ## outrunning the player. Aggro covers its own room and no more,
-  ## so it doesn't pace at the seals while you're still shopping.
-  name: "big_demon", hp: 20, speed: 55, aggro: 420)
+  ## outrunning the player. Aggro is bigger than the whole room:
+  ## sensing is room-scoped (Chapter 10), so stepping into the
+  ## throne room is starting the fight.
+  name: "big_demon", hp: 20, speed: 55, aggro: 1000)
 
 proc scaled*(s: EnemyStats, floorNum: int): EnemyStats =
   ## Per-floor difficulty: +1 hp every second floor, +8% speed per

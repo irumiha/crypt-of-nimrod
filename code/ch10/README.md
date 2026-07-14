@@ -19,8 +19,9 @@ Build and run: `nimble run` — tests: `nimble test`
 | `src/tilemap.nim` | changed | tile kinds added: `tkSealed` (gold-tinted wall, solid until unsealed) and `tkStairs`; `initTilemap` + `setTile` for generators |
 | `src/collision.nim` | changed | sealed tiles are solid |
 | `src/ecs.nim` | changed | `PickupKind` (coin/key) component added |
-| `src/systems.nim` | changed | `pickupSystem` returns what was picked up, not a count |
+| `src/systems.nim` | changed | `pickupSystem` returns what was picked up, not a count; `aiSystem` takes the dungeon and scopes aggro to the player's room (distance checks don't respect walls, so enemies used to pile up in doorways) |
 | `src/camera.nim` | changed | `follow` takes a pan speed (room transitions use a slower one) |
 | `src/crypt_of_nimrod.nim` | changed | generated floors replace the hand-drawn map; room-locked camera targeting; key/seal flow; stairs regenerate the next floor |
 | `tests/tworld.nim` | changed | pickup test follows `pickupSystem`'s new return type |
+| `tests/tcombat.nim` | changed | ai suite runs in a generated crypt; new test: a wall blocks aggro |
 | everything else | unchanged | |

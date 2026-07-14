@@ -260,7 +260,7 @@ proc main =
         run.world.swingSword(atlas, run.knight, run.swordPower)
         bank.play(sfxSwing)
       run.world.playerInputSystem(playerSpeed)
-      run.world.aiSystem(run.knight)
+      run.world.aiSystem(run.knight, run.crypt)
       run.world.healthSystem(dt)
       run.world.movementSystem(run.crypt.map, dt, dbg.noclip)
       let hpBefore = run.world.healths[run.knight.idx].hp

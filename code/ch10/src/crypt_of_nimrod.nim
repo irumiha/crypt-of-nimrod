@@ -169,7 +169,7 @@ proc main =
       attackCooldown = attackCooldownTime
       world.swingSword(atlas, knight)
     world.playerInputSystem(playerSpeed)
-    world.aiSystem(knight)
+    world.aiSystem(knight, crypt)
     world.healthSystem(dt)
     world.movementSystem(crypt.map, dt, dbg.noclip)
     world.contactSystem()
