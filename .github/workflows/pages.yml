@@ -1,7 +1,8 @@
 # Builds the finished game (code/ch17) for the web and publishes it to
-# GitHub Pages on every push to main. configure-pages enables Pages on
-# the repository the first time, so there is no manual setup: fork the
-# repo, push, and your game has a URL to send to a friend.
+# GitHub Pages on every push to main. One-time setup on a fresh fork
+# (the workflow token isn't allowed to do it for you): repository
+# Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+# After that, every push updates the URL you send to your friends.
 name: Web
 
 on:
@@ -39,8 +40,6 @@ jobs:
           version: 6.0.2
 
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Install dependencies, generate nimble.paths
         working-directory: ${{ env.GAME_DIR }}

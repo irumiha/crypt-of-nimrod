@@ -81,8 +81,9 @@ If you want your friends to play it, steal our release pipeline too:
 `.github/workflows/release.yml` builds Windows, Linux, and macOS zips when
 you push a tag (`git tag v1.0 && git push --tags`), and
 `.github/workflows/pages.yml` publishes the browser version to GitHub Pages
-on every push to main — fork the repo and your game has a URL. Chapter 17
-of the book walks through both.
+on every push to main. One repository setting first (Settings → Pages →
+Source: "GitHub Actions") and your fork has a URL. Chapter 17 of the book
+walks through both.
 
 ## Assets
 
