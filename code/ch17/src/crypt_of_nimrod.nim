@@ -529,7 +529,11 @@ when defined(emscripten):
 
 proc main =
   randomize()
-  setConfigFlags(flags(WindowHighdpi, WindowResizable))
+  when not defined(emscripten):
+    # Desktop-only flags: on the web the canvas is a fixed 800x450
+    # framebuffer and the shell page does the integer scaling (the
+    # HIGHDPI flag makes emscripten's GLFW shrink the canvas instead).
+    setConfigFlags(flags(WindowHighdpi, WindowResizable))
   initWindow(screenWidth, screenHeight, "Crypt of Nimrod")
   initAudioDevice()
   setExitKey(KeyboardKey.Null)   # Esc pauses; it does not quit

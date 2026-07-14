@@ -11,11 +11,16 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #181425;   /* the crypt's own background color */
+      overflow: hidden;
+      background: black;             /* the letterbox, page edition */
     }
     canvas.emscripten {
       border: 0;
-      image-rendering: pixelated;   /* crisp texels if the browser scales */
+      image-rendering: pixelated;    /* crisp texels when the page scales us */
+      /* !important so this outranks the inline style emscripten's GLFW
+         shim writes during init; fit() below sets the variables. */
+      width: var(--game-w, 800px) !important;
+      height: var(--game-h, 450px) !important;
     }
     #status { color: #8b7d9e; font: 16px monospace; position: absolute; }
   </style>
@@ -25,6 +30,21 @@
   <canvas class="emscripten" id="canvas"
           oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
   <script>
+    // The same presentation rule the game applies on desktop (Chapter
+    // 12), done in the page's terms: the canvas keeps its fixed
+    // 800x450 framebuffer, and CSS displays it at the largest INTEGER
+    // scale in device pixels that fits the browser window, centered.
+    // Fractional scales smear pixel art; integers keep texels square.
+    function fit() {
+      var dpr = window.devicePixelRatio || 1;
+      var s = Math.max(1, Math.floor(Math.min(
+        window.innerWidth*dpr/800, window.innerHeight*dpr/450)));
+      var root = document.documentElement.style;
+      root.setProperty('--game-w', (800*s/dpr) + 'px');
+      root.setProperty('--game-h', (450*s/dpr) + 'px');
+    }
+    window.addEventListener('resize', fit);
+    fit();
     var Module = {
       canvas: document.getElementById('canvas'),
       onRuntimeInitialized: function () {
