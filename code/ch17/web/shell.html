@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Crypt of Nimrod</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #181425;   /* the crypt's own background color */
+    }
+    canvas.emscripten {
+      border: 0;
+      image-rendering: pixelated;   /* crisp texels if the browser scales */
+    }
+    #status { color: #8b7d9e; font: 16px monospace; position: absolute; }
+  </style>
+</head>
+<body>
+  <div id="status">summoning the crypt...</div>
+  <canvas class="emscripten" id="canvas"
+          oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+  <script>
+    var Module = {
+      canvas: document.getElementById('canvas'),
+      onRuntimeInitialized: function () {
+        document.getElementById('status').remove();
+      }
+    };
+  </script>
+  {{{ SCRIPT }}}
+</body>
+</html>

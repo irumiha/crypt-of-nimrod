@@ -77,10 +77,12 @@ nimble run
 There are no paths to fix and no build scripts to adapt. From here on it is
 an ordinary Nim project.
 
-If you want your friends to play it, steal our release pipeline too: copy
-`.github/workflows/release.yml` into your repo, push a tag, and GitHub builds
-Windows, Linux, macOS, and browser versions for you. Chapter 17 of the book
-walks through how it works.
+If you want your friends to play it, steal our release pipeline too:
+`.github/workflows/release.yml` builds Windows, Linux, and macOS zips when
+you push a tag (`git tag v1.0 && git push --tags`), and
+`.github/workflows/pages.yml` publishes the browser version to GitHub Pages
+on every push to main — fork the repo and your game has a URL. Chapter 17
+of the book walks through both.
 
 ## Assets
 

@@ -1,0 +1,66 @@
+# Builds the finished game (code/ch17) for the web and publishes it to
+# GitHub Pages on every push to main. configure-pages enables Pages on
+# the repository the first time, so there is no manual setup: fork the
+# repo, push, and your game has a URL to send to a friend.
+name: Web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  GAME_DIR: code/ch17
+
+jobs:
+  build:
+    name: Build WebAssembly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jiro4989/setup-nim-action@v2
+        with:
+          nim-version: 'stable'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Pinned to the version the web build was developed against.
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 6.0.2
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Install dependencies, generate nimble.paths
+        working-directory: ${{ env.GAME_DIR }}
+        run: nimble setup -Y
+
+      - name: Build for the web
+        working-directory: ${{ env.GAME_DIR }}
+        run: nim c -d:emscripten -d:release src/crypt_of_nimrod.nim
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.GAME_DIR }}/web
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

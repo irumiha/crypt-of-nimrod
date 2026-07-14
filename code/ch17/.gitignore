@@ -1,0 +1,8 @@
+nimble.develop
+nimble.paths
+nimbledeps
+web/index.html
+web/index.js
+web/index.wasm
+web/index.data
+dist/

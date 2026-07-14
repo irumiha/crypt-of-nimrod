@@ -1,0 +1,91 @@
+# The reader's release pipeline. Tag a version:
+#
+#     git tag v1.0 && git push --tags
+#
+# and this builds the finished game (code/ch17) for Linux, Windows, and
+# macOS, then attaches the zips to a GitHub release. The manual trigger
+# (workflow_dispatch) builds the same artifacts without publishing, so
+# the pipeline can be tested before it matters.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+env:
+  GAME_DIR: code/ch17
+
+jobs:
+  build:
+    name: ${{ matrix.artifact }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: crypt-of-nimrod-linux-x86_64
+            binary: crypt_of_nimrod
+          - os: windows-latest
+            artifact: crypt-of-nimrod-windows-x86_64
+            binary: crypt_of_nimrod.exe
+          - os: macos-latest
+            artifact: crypt-of-nimrod-macos-arm64
+            binary: crypt_of_nimrod
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jiro4989/setup-nim-action@v2
+        with:
+          nim-version: 'stable'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install raylib system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libx11-dev libxrandr-dev \
+            libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev \
+            libxinerama-dev libwayland-dev libxkbcommon-dev
+
+      - name: Build (release)
+        working-directory: ${{ env.GAME_DIR }}
+        run: nimble build -Y -d:release
+
+      # A playable folder: the binary next to the assets and shaders it
+      # loads by relative path. Zip it and it runs anywhere.
+      - name: Package
+        shell: bash
+        working-directory: ${{ env.GAME_DIR }}
+        run: |
+          mkdir -p dist/${{ matrix.artifact }}
+          cp bin/${{ matrix.binary }} dist/${{ matrix.artifact }}/
+          cp -r assets shaders dist/${{ matrix.artifact }}/
+          cd dist
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            7z a ${{ matrix.artifact }}.zip ${{ matrix.artifact }}
+          else
+            zip -qr ${{ matrix.artifact }}.zip ${{ matrix.artifact }}
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ env.GAME_DIR }}/dist/${{ matrix.artifact }}.zip
+
+  release:
+    name: Attach to GitHub release
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
