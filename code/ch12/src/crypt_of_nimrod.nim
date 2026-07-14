@@ -138,10 +138,14 @@ proc populateFloor(w: var World, d: Dungeon, atlas: Atlas,
 
 proc main =
   randomize()
-  setConfigFlags(flags(WindowHighdpi))
+  setConfigFlags(flags(WindowHighdpi, WindowResizable))
   initWindow(screenWidth, screenHeight, "Crypt of Nimrod")
   defer: closeWindow()
   setTargetFPS(60)
+
+  # The whole game renders into this fixed logical frame; the window
+  # only ever sees its integer-scaled, letterboxed image.
+  let target = loadCanvas(screenWidth, screenHeight)
 
   let atlas = loadAtlas(
     atlasDir & "0x72_DungeonTilesetII_v1.7.png",
@@ -174,10 +178,11 @@ proc main =
     dbg.update()
     let dt = getFrameTime()*dbg.timeScale
     if dbg.enabled:
+      let vp = computeViewport(screenWidth, screenHeight)
       if isKeyPressed(T):
-        world.positions[knight.idx] = mouseWorld(cam)
+        world.positions[knight.idx] = mouseWorld(cam, vp)
       if isKeyPressed(E):
-        world.spawnEnemy(atlas, mouseWorld(cam))
+        world.spawnEnemy(atlas, mouseWorld(cam, vp))
     attackCooldown -= dt
     if wasPressed(aAttack) and attackCooldown <= 0:
       attackCooldown = attackCooldownTime
@@ -231,7 +236,6 @@ proc main =
 
     # The camera locks to whichever room holds the knight and pans on
     # transitions (Chapter 6's easing, aimed at room centers).
-    cam.adaptToDpi(Vector2(x: screenWidth, y: screenHeight))
     let knightCenter = world.positions[knight.idx] + Vector2(
       x: world.sprites[knight.idx].width/2,
       y: world.sprites[knight.idx].height/2)
@@ -240,8 +244,9 @@ proc main =
                     else: knightCenter   # mid-doorway: follow him
     cam.follow(camTarget, crypt.map.pixelSize, dt, speed = 6)
 
-    # --- Draw ---
-    beginDrawing()
+    # --- Draw, pass 1: the game, at its fixed logical resolution ---
+    let vp = computeViewport(screenWidth, screenHeight)
+    beginTextureMode(target)
     clearBackground(backgroundColor)
     beginMode2D(cam)
     crypt.map.draw(atlas, skin)
@@ -249,10 +254,19 @@ proc main =
     drawFloatingTexts(world)       # world-space UI rides the camera
     dbg.drawWorld(world)
     endMode2D()
-    dbg.drawPanel(world, cam)
+    dbg.drawPanel(world, cam, vp)
     drawHud(atlas, crypt, room, world.healths[knight.idx],
             coinsCollected, swordPower, floorNum, screenWidth)
     drawFPS(10, 10)
+    endTextureMode()
+
+    # --- Draw, pass 2: blit the frame, integer-scaled, letterboxed ---
+    beginDrawing()
+    clearBackground(Black)
+    drawTexture(target.texture,
+      Rectangle(x: 0, y: 0, width: float32(screenWidth),
+                height: -float32(screenHeight)),   # RT is stored flipped
+      vp.dest, Vector2(x: 0, y: 0), 0, White)
     endDrawing()
 
 main()

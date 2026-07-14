@@ -1,6 +1,8 @@
 # Chapter 12 — HUD and UI
 
-Game state at the end of this chapter: the game presents itself.
+Game state at the end of this chapter: the game presents itself, and
+the window is resizable: the fixed 800×450 frame renders offscreen and
+blits at the largest integer scale that fits, letterboxed.
 Hearts instead of an hp string, icon stats for coins/power/floor/seal,
 a minimap built straight from the floor graph (gold = sealed stairs,
 outline = you), and floating damage numbers that jump out of whoever
@@ -13,6 +15,8 @@ Build and run: `nimble run` — tests: `nimble test`
 
 | File | Status | Notes |
 |------|--------|-------|
+| `src/camera.nim` | changed | `adaptToDpi` retired; + `Viewport`/`computeViewport` (integer-scaled letterbox), `mouseLogical`, and `loadCanvas` (render target built by hand around an upstream `loadRenderTexture` bug) |
+| `src/debug.nim` | changed | mouse mapping goes through the viewport |
 | `src/hud.nim` | new | hearts row, `drawIconStat`, minimap from the dungeon's room graph, world-space `drawFloatingTexts` |
 | `src/ecs.nim` | changed | `ckFloatText` component (+ column); `DamageEvent` + `damageEvents` frame scratch |
 | `src/systems.nim` | changed | `damageSystem` publishes damage events |

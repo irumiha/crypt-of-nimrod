@@ -8,7 +8,7 @@
 
 import std/strformat
 import raylib
-import ecs
+import camera, ecs
 
 type
   Debug* = object
@@ -32,10 +32,10 @@ proc update*(d: var Debug) =
       let at = timeScales.find(d.timeScale)
       d.timeScale = timeScales[(at + 1) mod timeScales.len]
 
-proc mouseWorld*(cam: Camera2D): Vector2 =
-  ## The mouse position in world coordinates: the camera transform,
-  ## inverted. raylib does the matrix math.
-  getScreenToWorld2D(getMousePosition(), cam)
+proc mouseWorld*(cam: Camera2D, vp: Viewport): Vector2 =
+  ## The mouse position in world coordinates: letterbox first (window
+  ## to logical frame), then the camera transform, inverted.
+  getScreenToWorld2D(vp.mouseLogical(), cam)
 
 proc drawWorld*(d: Debug, w: World) =
   ## World-space overlay (call between beginMode2D and endMode2D):
@@ -44,14 +44,14 @@ proc drawWorld*(d: Debug, w: World) =
     for i in w.query({ckPosition, ckCollider}):
       drawRectangleLines(w.colliderRect(i), 2, Red)
 
-proc drawPanel*(d: Debug, w: World, cam: Camera2D) =
+proc drawPanel*(d: Debug, w: World, cam: Camera2D, vp: Viewport) =
   ## Screen-space overlay: the status line, plus a full dump of any
   ## entity the mouse hovers (the echo test, aimed with the cursor).
   if d.enabled:
     let status = &"DEBUG  [N]oclip:{d.noclip}  [F2]time:x{d.timeScale}  " &
                  "[T]eleport [E]spawn"
     drawText(status, 10, 130, 20, Red)
-    let mw = mouseWorld(cam)
+    let mw = mouseWorld(cam, vp)
     for i in w.query({ckPosition, ckCollider}):
       if checkCollisionPointRec(mw, w.colliderRect(i)):
         drawText(w.dump(w.entity(i)), 10, 160, 20, Yellow)
