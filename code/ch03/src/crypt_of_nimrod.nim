@@ -1,5 +1,5 @@
 ## Chapter 3: real pixel art. A tiled crypt floor, a few props, and a
-## knight idling in the middle, all drawn from one texture atlas at 4x
+## knight idling in the middle, all drawn from one texture atlas at 2x
 ## scale (raylib's default point filtering keeps the pixels crisp).
 
 import std/random
@@ -7,9 +7,9 @@ import raylib
 import resources, sprites
 
 const
-  screenWidth = 1600
-  screenHeight = 900
-  scale = 4                # 16px art, 64px on screen
+  screenWidth = 800
+  screenHeight = 450
+  scale = 2                # 16px art, 32px on screen
   tileSize = 16*scale
   backgroundColor = Color(r: 24, g: 20, b: 37, a: 255)
   atlasDir = "assets/0x72_DungeonTilesetII_v1.7/"

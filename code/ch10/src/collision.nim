@@ -14,11 +14,15 @@ const solidTiles = {tkWall, tkVoid, tkSealed}
 
 proc overlapsSolid*(m: Tilemap, r: Rectangle): bool =
   ## Whether a world-space box overlaps any wall or void tile. Scans
-  ## just the tile range under the box (usually 1 to 4 cells).
+  ## just the tile range under the box (usually 1 to 4 cells). The far
+  ## edges divide in float space: truncating the position to an int
+  ## first would let a box sink a fraction of a pixel into a wall
+  ## undetected. The 0.01 keeps an edge sitting exactly on a tile
+  ## boundary from counting as inside the next tile.
   let x0 = int32(r.x) div tileSize
   let y0 = int32(r.y) div tileSize
-  let x1 = int32(r.x + r.width - 1) div tileSize
-  let y1 = int32(r.y + r.height - 1) div tileSize
+  let x1 = int32((r.x + r.width - 0.01)/float32(tileSize))
+  let y1 = int32((r.y + r.height - 0.01)/float32(tileSize))
   for ty in y0..y1:
     for tx in x0..x1:
       if m.tileAt(tx, ty) in solidTiles:
@@ -37,7 +41,7 @@ proc moveAndSlide*(m: Tilemap, pos: var Vector2, col: Collider,
   if m.overlapsSolid(r):
     result.x = true
     if delta.x > 0:   # moving right: flush against the tile's left edge
-      let edge = (int32(r.x + r.width - 1) div tileSize)*tileSize
+      let edge = int32((r.x + r.width - 0.01)/float32(tileSize))*tileSize
       pos.x = float32(edge) - col.size.x - col.offset.x
     elif delta.x < 0: # moving left: flush against the tile's right edge
       let edge = (int32(r.x) div tileSize + 1)*tileSize
@@ -49,7 +53,7 @@ proc moveAndSlide*(m: Tilemap, pos: var Vector2, col: Collider,
   if m.overlapsSolid(r):
     result.y = true
     if delta.y > 0:
-      let edge = (int32(r.y + r.height - 1) div tileSize)*tileSize
+      let edge = int32((r.y + r.height - 0.01)/float32(tileSize))*tileSize
       pos.y = float32(edge) - col.size.y - col.offset.y
     elif delta.y < 0:
       let edge = (int32(r.y) div tileSize + 1)*tileSize

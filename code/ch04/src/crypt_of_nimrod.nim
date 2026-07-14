@@ -8,9 +8,9 @@ import raylib
 import ecs, resources, sprites, systems
 
 const
-  screenWidth = 1600
-  screenHeight = 900
-  scale = 4                # 16px art, 64px on screen
+  screenWidth = 800
+  screenHeight = 450
+  scale = 2                # 16px art, 32px on screen
   tileSize = 16*scale
   backgroundColor = Color(r: 24, g: 20, b: 37, a: 255)
   atlasDir = "assets/0x72_DungeonTilesetII_v1.7/"
@@ -30,8 +30,8 @@ proc spawnCritter(w: var World, atlas: Atlas) =
     x: float32(rand(tileSize..(screenWidth - 2*tileSize))),
     y: float32(rand(tileSize..(screenHeight - 2*tileSize))))
   w.velocities[e.idx] = Vector2(
-    x: float32(rand(-150.0..150.0)),
-    y: float32(rand(-120.0..120.0)))
+    x: float32(rand(-75.0..75.0)),
+    y: float32(rand(-60.0..60.0)))
 
 proc spawnCoin(w: var World, atlas: Atlas) =
   ## A coin that expires on its own: same spawn shape as a critter,

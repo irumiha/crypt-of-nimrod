@@ -9,9 +9,9 @@ import raylib, raymath
 import camera, debug, ecs, input, resources, sprites, systems, tilemap
 
 const
-  screenWidth = 1600
-  screenHeight = 900
-  playerSpeed = 340        # px/s; the crypt is large and life is short
+  screenWidth = 800
+  screenHeight = 450
+  playerSpeed = 170        # px/s; the crypt is large and life is short
   attackCooldownTime = 0.35
   backgroundColor = Color(r: 24, g: 20, b: 37, a: 255)
   atlasDir = "assets/0x72_DungeonTilesetII_v1.7/"
@@ -26,11 +26,11 @@ type
     aggro: float32
 
 const enemyKinds = [
-  EnemyStats(name: "goblin", hp: 2, speed: 170, aggro: 300),
-  EnemyStats(name: "skelet", hp: 2, speed: 140, aggro: 340),
-  EnemyStats(name: "imp",    hp: 1, speed: 190, aggro: 280),
-  EnemyStats(name: "chort",  hp: 3, speed: 160, aggro: 320),
-  EnemyStats(name: "ogre",   hp: 5, speed: 90,  aggro: 380)]
+  EnemyStats(name: "goblin", hp: 2, speed: 85, aggro: 150),
+  EnemyStats(name: "skelet", hp: 2, speed: 70, aggro: 170),
+  EnemyStats(name: "imp",    hp: 1, speed: 95, aggro: 140),
+  EnemyStats(name: "chort",  hp: 3, speed: 80, aggro: 160),
+  EnemyStats(name: "ogre",   hp: 5, speed: 45, aggro: 190)]
 
 const cryptMap = """
 ################
@@ -74,11 +74,11 @@ proc spawnEnemy(w: var World, atlas: Atlas,
   w.healths[e.idx] = Health(hp: stats.hp, maxHp: stats.hp,
                             invulnTime: 0.3)
   w.ais[e.idx] = Ai(chaseSpeed: stats.speed, aggro: stats.aggro)
-  w.contactDamages[e.idx] = ContactDamage(amount: 1, knockback: 500)
+  w.contactDamages[e.idx] = ContactDamage(amount: 1, knockback: 250)
   w.positions[e.idx] = map.randomFloorPos()
   w.velocities[e.idx] = Vector2(
-    x: float32(rand(-120.0..120.0)),
-    y: float32(rand(-120.0..120.0)))
+    x: float32(rand(-60.0..60.0)),
+    y: float32(rand(-60.0..60.0)))
   e
 
 proc spawnCoin(w: var World, atlas: Atlas, map: Tilemap) =
@@ -104,13 +104,13 @@ proc swingSword(w: var World, atlas: Atlas, player: Entity) =
   w.positions[e.idx] = Vector2(
     x: if facingLeft: px.x - w.sprites[e.idx].width
        else: px.x + w.sprites[player.idx].width,
-    y: px.y + 12)
+    y: px.y + 6)
   w.colliders[e.idx] = Collider(
-    offset: Vector2(x: -12, y: -12),
-    size: Vector2(x: w.sprites[e.idx].width + 24,
-                  y: w.sprites[e.idx].height + 24),
+    offset: Vector2(x: -6, y: -6),
+    size: Vector2(x: w.sprites[e.idx].width + 12,
+                  y: w.sprites[e.idx].height + 12),
     layer: lyPlayerAttack, hits: {lyEnemy})
-  w.contactDamages[e.idx] = ContactDamage(amount: 1, knockback: 600)
+  w.contactDamages[e.idx] = ContactDamage(amount: 1, knockback: 300)
   w.lifetimes[e.idx] = 0.15
 
 proc main =

@@ -9,9 +9,9 @@ import raylib, raymath
 import camera, ecs, resources, sprites, systems, tilemap
 
 const
-  screenWidth = 1600
-  screenHeight = 900
-  playerSpeed = 340        # px/s; the crypt is large and life is short
+  screenWidth = 800
+  screenHeight = 450
+  playerSpeed = 170        # px/s; the crypt is large and life is short
   backgroundColor = Color(r: 24, g: 20, b: 37, a: 255)
   atlasDir = "assets/0x72_DungeonTilesetII_v1.7/"
   critterNames = ["goblin", "skelet", "imp", "chort", "ogre"]
@@ -57,8 +57,8 @@ proc spawnCritter(w: var World, atlas: Atlas, map: Tilemap) =
   w.colliders[e.idx] = feetCollider(w.sprites[e.idx], lyEnemy)
   w.positions[e.idx] = map.randomFloorPos()
   w.velocities[e.idx] = Vector2(
-    x: float32(rand(-150.0..150.0)),
-    y: float32(rand(-120.0..120.0)))
+    x: float32(rand(-75.0..75.0)),
+    y: float32(rand(-60.0..60.0)))
 
 proc spawnCoin(w: var World, atlas: Atlas, map: Tilemap) =
   ## A coin that expires on its own unless somebody picks it up first.

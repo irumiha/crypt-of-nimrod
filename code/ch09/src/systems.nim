@@ -39,8 +39,8 @@ proc aiSystem*(w: var World, player: Entity) =
             w.ais[i].state = asWander
             # Pick a fresh direction to drift off in.
             w.velocities[i] = Vector2(
-              x: float32(rand(-120.0..120.0)),
-              y: float32(rand(-120.0..120.0)))
+              x: float32(rand(-60.0..60.0)),
+              y: float32(rand(-60.0..60.0)))
         if w.ais[i].state == asChase and dist > 1:
           w.velocities[i] = normalize(toPlayer)*w.ais[i].chaseSpeed
 

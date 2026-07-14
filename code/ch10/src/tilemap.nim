@@ -12,7 +12,7 @@ import raylib
 import resources
 
 const
-  scale* = 4               # 16px art, 64px on screen
+  scale* = 2               # 16px art, 32px on screen
   tileSize* = 16*scale
   # Tint multiplies the texture's colors; a gray-purple darkens the
   # brick into a believable wall top without extra art, and old gold

@@ -8,8 +8,8 @@ import std/math
 import raylib
 
 const
-  screenWidth = 1600
-  screenHeight = 900
+  screenWidth = 800
+  screenHeight = 450
   # The palette of the crypt: near-black purple and old gold.
   backgroundColor = Color(r: 24, g: 20, b: 37, a: 255)
   crownColor = Color(r: 232, g: 193, b: 112, a: 255)
@@ -18,21 +18,21 @@ proc drawCrown(cx, cy: int32) =
   ## Draws a crown of plain shapes centered-ish on (cx, cy), in screen
   ## coordinates (origin top-left, y grows downward). Programmer art;
   ## the real crown is at the bottom of the crypt.
-  let left = cx - 120
-  let top = cy - 80
+  let left = cx - 60
+  let top = cy - 40
   # The band.
-  drawRectangle(left, top + 100, 240, 60, crownColor)
+  drawRectangle(left, top + 50, 120, 30, crownColor)
   # Three prongs, rendered as triangles. Vertices must be given in
   # counter-clockwise order or raylib culls the triangle entirely.
   for i in 0'i32..2'i32:
-    let px = left + i*80
+    let px = left + i*40
     drawTriangle(
-      Vector2(x: float32(px), y: float32(top + 100)),
-      Vector2(x: float32(px + 80), y: float32(top + 100)),
-      Vector2(x: float32(px + 40), y: float32(top)),
+      Vector2(x: float32(px), y: float32(top + 50)),
+      Vector2(x: float32(px + 40), y: float32(top + 50)),
+      Vector2(x: float32(px + 20), y: float32(top)),
       crownColor)
   # The jewel, set in the middle of the band.
-  drawCircle(cx, cy + 50, 18, Color(r: 165, g: 48, b: 48, a: 255))
+  drawCircle(cx, cy + 25, 9, Color(r: 165, g: 48, b: 48, a: 255))
 
 proc main =
   # HighDPI must be requested before the window exists. Without it, a
@@ -50,21 +50,21 @@ proc main =
     # moves gets multiplied by it, so speed is per-second, not per-frame.
     let dt = getFrameTime()
     elapsed += dt
-    # A gentle bob: 20 pixels of amplitude, one full cycle per two seconds.
-    let bob = int32(20*sin(elapsed*PI))
+    # A gentle bob: 10 pixels of amplitude, one full cycle per two seconds.
+    let bob = int32(10*sin(elapsed*PI))
 
     # --- Draw ---
     # Immediate mode: nothing persists between frames. Clear, then
     # redraw the entire scene, every frame.
     beginDrawing()
     clearBackground(backgroundColor)
-    drawCrown(screenWidth div 2, screenHeight div 2 - 80 + bob)
+    drawCrown(screenWidth div 2, screenHeight div 2 - 40 + bob)
     let title = "CRYPT OF NIMROD"
-    let titleWidth = measureText(title, 80)
-    drawText(title, (screenWidth - titleWidth) div 2, 600, 80, crownColor)
+    let titleWidth = measureText(title, 40)
+    drawText(title, (screenWidth - titleWidth) div 2, 300, 40, crownColor)
     let subtitle = "a roguelite, eventually"
-    let subWidth = measureText(subtitle, 40)
-    drawText(subtitle, (screenWidth - subWidth) div 2, 700, 40, LightGray)
+    let subWidth = measureText(subtitle, 20)
+    drawText(subtitle, (screenWidth - subWidth) div 2, 350, 20, LightGray)
     drawFPS(10, 10)
     endDrawing()
 

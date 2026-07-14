@@ -18,7 +18,7 @@ import tilemap
 const
   roomCols* = 4        # the floor is a 4x3 grid of potential rooms
   roomRows* = 3
-  roomW* = 25          # tiles per room: exactly one 1600x900 screen
+  roomW* = 25          # tiles per room: exactly one 800x450 screen
   roomH* = 14
 
 type

@@ -13,7 +13,7 @@ const tinyMap = """
 #......#
 #......#
 ########"""
-  # 8x4 tiles: floor spans x 64..447, y 64..191 in world pixels.
+  # 8x4 tiles: floor spans x 32..223, y 32..95 in world pixels.
 
 proc spawnBox(w: var World, x, y: float32,
               vx: float32 = 0, vy: float32 = 0,
@@ -31,14 +31,14 @@ suite "walls":
     let map = parseMap(tinyMap)
 
   test "driving right stops flush against the wall":
-    let e = world.spawnBox(x = 96, y = 96, vx = 400)
+    let e = world.spawnBox(x = 66, y = 40, vx = 200)
     for _ in 1..120:
       world.movementSystem(map, 1/60)
     check world.positions[e.idx].x == float32(7*tileSize) - 32
-    check world.positions[e.idx].y == 96
+    check world.positions[e.idx].y == 40
 
   test "diagonal movement slides along the wall, then corners":
-    let e = world.spawnBox(x = 96, y = 96, vx = 400, vy = 100)
+    let e = world.spawnBox(x = 66, y = 40, vx = 200, vy = 50)
     for _ in 1..120:
       world.movementSystem(map, 1/60)
     # Pinned in the bottom-right inner corner, flush on both axes.
@@ -46,7 +46,7 @@ suite "walls":
     check world.positions[e.idx].y == float32(3*tileSize) - 32
 
   test "the bounce tag reflects velocity off a wall":
-    let e = world.spawnBox(x = 400, y = 96, vx = 400, extra = {ckBounce})
+    let e = world.spawnBox(x = 180, y = 40, vx = 400, extra = {ckBounce})
     for _ in 1..10:
       world.movementSystem(map, 1/60)
     check world.velocities[e.idx].x == -400

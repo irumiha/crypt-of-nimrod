@@ -23,11 +23,11 @@ proc spawnEmber*(x, y: float32): Ember =
   ## randomized speed and lifespan.
   let life = float32(rand(2.0..4.0))
   Ember(
-    pos: Vector2(x: x + float32(rand(-160.0..160.0)), y: y),
+    pos: Vector2(x: x + float32(rand(-80.0..80.0)), y: y),
     # The space in `.. -50.0` is required: without it, `..-` parses
     # as a single (undefined) operator.
-    vel: Vector2(x: float32(rand(-25.0..25.0)),
-                 y: float32(rand(-130.0.. -50.0))),
+    vel: Vector2(x: float32(rand(-12.0..12.0)),
+                 y: float32(rand(-65.0.. -25.0))),
     life: life,
     maxLife: life)
 
@@ -53,5 +53,5 @@ proc draw*(embers: seq[Ember]) =
   ## Draws each ember as a small circle, fading out as life runs down.
   for e in embers:
     let alpha = uint8(255*e.life/e.maxLife)
-    drawCircle(int32(e.pos.x), int32(e.pos.y), 4,
+    drawCircle(int32(e.pos.x), int32(e.pos.y), 2,
       Color(r: emberColor.r, g: emberColor.g, b: emberColor.b, a: alpha))
