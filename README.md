@@ -68,7 +68,7 @@ it somewhere the book doesn't go. Any chapter directory works as a standalone
 project — copy it out and it is yours:
 
 ```sh
-cp -r code/ch16 ~/projects/my-game
+cp -r code/ch17 ~/projects/my-game
 cd ~/projects/my-game
 git init
 nimble run
@@ -79,7 +79,7 @@ an ordinary Nim project.
 
 If you want your friends to play it, steal our release pipeline too: copy
 `.github/workflows/release.yml` into your repo, push a tag, and GitHub builds
-Windows, Linux, macOS, and browser versions for you. Chapter 16 of the book
+Windows, Linux, macOS, and browser versions for you. Chapter 17 of the book
 walks through how it works.
 
 ## Assets

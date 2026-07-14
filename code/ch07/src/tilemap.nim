@@ -2,7 +2,7 @@
 ## drawn from the atlas. Your text editor is the level editor; a `#`
 ## is a wall, a `.` is floor, anything else is the void outside.
 ##
-## Chapter 9 replaces the hand-drawn map with a generator, but it
+## Chapter 10 replaces the hand-drawn map with a generator, but it
 ## produces this same Tilemap, so everything downstream survives.
 
 import std/[random, strutils]

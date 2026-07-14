@@ -18,6 +18,12 @@ for ch in "${chapters[@]}"; do
   if ! (cd "$ch" && nimble build -Y); then
     failed+=("$name")
   fi
+  if [ -d "$ch/tests" ]; then
+    echo "==> Testing $name"
+    if ! (cd "$ch" && nimble test -Y); then
+      failed+=("$name tests")
+    fi
+  fi
 done
 
 if [ ${#failed[@]} -gt 0 ]; then

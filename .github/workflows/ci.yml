@@ -61,6 +61,15 @@ jobs:
             nim c --outdir:bin src/tour.nim
           fi
 
+      # From ch08 on, chapters carry headless tests: the real systems,
+      # no window, no GPU — which is why they can run right here.
+      - name: Run tests (if present)
+        working-directory: code/${{ matrix.chapter }}
+        run: |
+          if [ -d tests ]; then
+            nimble test -Y
+          fi
+
   # Every chapter carries its own copy of assets/ so it is standalone.
   # This job makes sure no copy drifts from the canonical top-level assets/:
   # re-running the sync must leave the working tree untouched.
