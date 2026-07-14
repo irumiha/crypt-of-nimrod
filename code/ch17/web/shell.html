@@ -45,6 +45,17 @@
     }
     window.addEventListener('resize', fit);
     fit();
+    // Browsers keep audio muted until a user gesture, and raylib's
+    // audio glue (miniaudio) only unmutes on click/touch. Our title
+    // screen says "press SPACE", so keys must count too: a trusted
+    // keydown carries the same user-activation, and miniaudio leaves
+    // its unlock function on the window for exactly this poke.
+    document.addEventListener('keydown', function kick() {
+      if (window.miniaudio && miniaudio.unlock) {
+        miniaudio.unlock();
+        document.removeEventListener('keydown', kick);
+      }
+    });
     var Module = {
       canvas: document.getElementById('canvas'),
       onRuntimeInitialized: function () {
