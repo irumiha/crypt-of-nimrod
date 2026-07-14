@@ -24,8 +24,8 @@ proc spawnEmber*(x, y: float32): Ember =
   let life = float32(rand(2.0..4.0))
   Ember(
     pos: Vector2(x: x + float32(rand(-160.0..160.0)), y: y),
-    # The space in `..  -50.0` is load-bearing: without it, `..-`
-    # parses as a single (undefined) operator.
+    # The space in `.. -50.0` is required: without it, `..-` parses
+    # as a single (undefined) operator.
     vel: Vector2(x: float32(rand(-25.0..25.0)),
                  y: float32(rand(-130.0.. -50.0))),
     life: life,
