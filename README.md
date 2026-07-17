@@ -1,5 +1,23 @@
 # Crypt of Nimrod
 
+> **Archived, and left up on purpose.**
+>
+> This is the Nim version of the game and it is finished: seventeen
+> chapters, each leaving a complete playable build, plus the headless
+> tests, the release workflows and the WebAssembly port. It compiles and
+> it plays.
+>
+> The book it was written for carried on in Odin, as
+> [**Crypt of Odin**](https://github.com/irumiha/crypt-of-odin) — same
+> game, same chapter ladder, different language. I switched for my own
+> iteration loop, wanting sub-second builds and editor tooling I could
+> lean on, and not because there is anything wrong with the code here. If
+> you write games in Nim, this repository is probably more use to you than
+> that one.
+>
+> Read-only since 2026-07-17 and not maintained. The code is MIT and the
+> assets are CC0, so take whatever is useful.
+
 A top-down action roguelite written in [Nim](https://nim-lang.org) with
 [raylib](https://www.raylib.com) (via the excellent
 [naylib](https://github.com/planetis-m/naylib) binding).
